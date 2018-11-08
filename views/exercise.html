@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html>
+
+   <head>
+      <title>Exercise Microservice</title>
+      <link rel="shortcut icon" href="https://cdn.hyperdev.com/us-east-1%3A52a203ff-088b-420f-81be-45bf559d01b1%2Ffavicon.ico" type="image/x-icon"/>
+      <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+      <link href="style.css" rel="stylesheet" type="text/css">
+   </head>
+
+   <body>
+    <style>
+      h3, h4{ margin: 0}
+      h4{
+        display: block
+        font-style: italic;
+        font-size: .8em;
+      }
+      #output{
+        width: 500px;
+        height: 200px;
+      }
+      form{
+        width: 300px;
+        margin: 10px auto;
+        padding: 10px;
+        border-radius: 5px;
+        background: #eee;
+        border: 1px solid #ddd;
+      }
+      input, label{
+        display: block;
+        margin: 10px 12px;
+      }
+      label{
+        margin: 6px 12px;
+        text-align: left;
+        line-height: 1em;
+      }
+      button{
+        width: 100px;
+      }
+      input:required{
+        border-color: red;
+      }
+      
+      input:required:valid{
+        border-color: green;
+      }
+    </style>
+      <div class="container">
+        <h2>API Project: Exercise Microservice</h2>
+        <form id="new-form">
+          <h3>
+            Create User
+          </h3>
+          <h4>
+            POST /api/exercise/new-user
+          </h4>
+          <input name="username" placeholder="username" required>
+          <button type="submit" id="new-submit">Submit</button>
+        </form>
+        <form id="add-form">
+          <h3>
+            Add Exercise
+          </h3>
+          <h4>
+            POST /api/exercise/add
+          </h4>
+          <input name="userId" placeholder="userId" required>
+          <input name="description" type="text" placeholder="description" required>
+          <input name="duration" type="number" placeholder="minute duration" required>
+          <label for="add-date">date:</label>
+          <input type="date" name="date" id="add-date">
+          <button type="submit" id="add-submit">Submit</button>
+        </form>
+        <form id="get-form">
+          <h3>
+            Get Logs
+          </h3>
+          <h4>
+            GET /api/exercise/log?{userId}[&from][&to][&limit]
+          </h4>
+          <input name="userId" type="text" placeholder="userId" required>
+          <input name="limit" type="limit" placeholder="limit">
+          <label for="get-from">from:</label>
+          <input name="from" type="date" placeholder="From" id="get-from">
+          <label for="get-to">to:</label>
+          <input name="to" type="date" placeholder="to">
+          <button type="submit" id="get-submit">
+            Submit
+          </button>
+        </form>
+        <textarea id="output"></textarea>
+      </div>
+     <script>
+       'use strict';
+       let textarea = document.querySelector('textarea');
+       document.querySelector('#new-form').addEventListener('submit', async (e)=>{
+         e.preventDefault();
+         let formData = new FormData(e.target);
+         let res = await fetch('/api/exercise/new-user', {method: "POST", body: formData});
+         textarea.value = JSON.stringify(await res.json());
+       });
+       
+       document.querySelector('#add-form').addEventListener('submit', async (e)=>{
+         e.preventDefault();
+         
+         let formData = new FormData(e.target);
+         let res = await fetch("/api/exercise/add", {method: "POST", body: formData});
+         textarea.value = JSON.stringify(await res.json());
+       });
+       
+       document.querySelector('#get-form').addEventListener('submit', async (e)=>{
+         e.preventDefault();
+         let formData = new FormData(e.target);
+         let entries = formData.entries();
+         let queryString = '';
+         for(let entry of entries){
+           if(entry[1].length > 0) 
+             queryString += entry[0] + '=' + entry[1] + '&';
+         }
+         queryString = queryString.replace(/&$/, '');
+         let res = await fetch('/api/exercise/log?' + queryString, {method: "GET"});     
+         textarea.value = JSON.stringify(await res.json());
+       });
+     </script>
+   </body>
+</html>
